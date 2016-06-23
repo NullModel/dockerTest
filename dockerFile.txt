@@ -8,20 +8,40 @@ FROM ubuntu:14.04
 # File Author / Maintainer
 MAINTAINER Null Model <nullmodel@gmail.com>
 
-# Setup packages
+# installing packages needed here
 USER root
-RUN apt-get -m update && apt-get install -y wget unzip openjdk-7-jre zip
+# RUN apt-get -m update && apt-get install -y wget unzip zip rsync krb5-kdc
+RUN apt-get -m update && apt-get install -y wget unzip zip rsync libkrb5-3 mysql-client
 
-# get the tool and install it in /usr/local/bin
-RUN wget -q http://downloads.sourceforge.net/project/bamstats/BAMStats-1.25.zip
-RUN unzip BAMStats-1.25.zip && \
-    rm BAMStats-1.25.zip && \
-    mv BAMStats-1.25 /opt/
-COPY bin/bamstats /usr/local/bin/
-RUN chmod a+x /usr/local/bin/bamstats
+# get the tool binaries into /usr/local/bin
+# RUN wget --timestamping -P /usr/local/bin/ -q http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/bigBedInfo && \
+#     chmod a+x /usr/local/bin/big*
+#     --timestamping -P /usr/local/bin/ -r -l 0 -nd -np
+
+RUN wget -q --timestamping -P /usr/local/bin/ -nd -np \
+      "ftp://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/featureBits" && \
+    wget -q --timestamping -P /usr/local/bin/ -nd -np \
+      "ftp://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/hgsql" && \
+    wget -q --timestamping -P /usr/local/bin/ -nd -np \
+      "ftp://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/twoBitInfo" && \
+    wget -q --timestamping -P /usr/local/bin/ -nd -np \
+      "ftp://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/faToTwoBit" && \
+    wget -q --timestamping -P /usr/local/bin/ -nd -np \
+      "ftp://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/twoBitToFa" && \
+    wget -q --reject "blat" --reject "gfClient" --reject "gfServer" \
+    --timestamping -P /usr/local/bin/ -r -nd -np \
+      "ftp://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/big*" && \
+      chmod a+x /usr/local/bin/*
+
+RUN groupadd -r -g 1000 ubuntu && useradd -m -r -g ubuntu -u 1000 ubuntu
+
+COPY resources/public.hg.conf /home/ubuntu/.hg.conf
+COPY resources/testCommands.sh /home/ubuntu/testCommands.sh
+RUN chmod 600 /home/ubuntu/.hg.conf && \
+    chown ubuntu:ubuntu /home/ubuntu/.hg.conf /home/ubuntu/testCommands.sh && \
+    chmod +x /home/ubuntu/testCommands.sh
 
 # switch back to the ubuntu user so this tool (and the files written) are not owned by root
-RUN groupadd -r -g 1000 ubuntu && useradd -r -g ubuntu -u 1000 ubuntu
 USER ubuntu
 
 # by default /bin/bash is executed
