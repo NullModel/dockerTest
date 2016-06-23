@@ -25,7 +25,7 @@ bigPslToPsl       bigWigInfo            faToTwoBit
 There is a short test script in the ubuntu user home directory: testCommands.sh
 that will exercise a couple of these commands:
 ```
-cat testCommands.sh 
+$ cat testCommands.sh 
 #!/bin/sh
 
 printf "featureBits hg38 -countGaps knownGene\n" 1>&2
