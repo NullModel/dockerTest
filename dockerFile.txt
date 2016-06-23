@@ -1,6 +1,6 @@
-#############################################################
-# Dockerfile to build a sample tool container for BAMStats
-#############################################################
+######################################################################
+# Dockerfile to build a sample tool container for UCSC kent commands #
+######################################################################
 
 # Set the base image to Ubuntu
 FROM ubuntu:14.04
@@ -10,13 +10,9 @@ MAINTAINER Null Model <nullmodel@gmail.com>
 
 # installing packages needed here
 USER root
-# RUN apt-get -m update && apt-get install -y wget unzip zip rsync krb5-kdc
 RUN apt-get -m update && apt-get install -y wget unzip zip rsync libkrb5-3 mysql-client
 
-# get the tool binaries into /usr/local/bin
-# RUN wget --timestamping -P /usr/local/bin/ -q http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/bigBedInfo && \
-#     chmod a+x /usr/local/bin/big*
-#     --timestamping -P /usr/local/bin/ -r -l 0 -nd -np
+# fetch the command binaries into /usr/local/bin
 
 RUN wget -q --timestamping -P /usr/local/bin/ -nd -np \
       "ftp://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/featureBits" && \
@@ -38,8 +34,7 @@ RUN groupadd -r -g 1000 ubuntu && useradd -m -r -g ubuntu -u 1000 ubuntu
 COPY resources/public.hg.conf /home/ubuntu/.hg.conf
 COPY resources/testCommands.sh /home/ubuntu/testCommands.sh
 RUN chmod 600 /home/ubuntu/.hg.conf && \
-    chown ubuntu:ubuntu /home/ubuntu/.hg.conf /home/ubuntu/testCommands.sh && \
-    chmod +x /home/ubuntu/testCommands.sh
+    chown ubuntu:ubuntu /home/ubuntu/.hg.conf /home/ubuntu/testCommands.sh
 
 # switch back to the ubuntu user so this tool (and the files written) are not owned by root
 USER ubuntu
