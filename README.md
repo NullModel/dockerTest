@@ -85,3 +85,6 @@ blastXmlToPsl           featureBits        mafFetch               pslReps
 calc                    findMotif          mafFrag                pslSelect
 
 ```
+
+Of course, some of those may require additional linux packages to be
+installed in the container.
